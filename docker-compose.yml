@@ -28,5 +28,7 @@ services:
 
   remotestorageadapter:
     image: gavind/prometheus-remote-storage-adapter:0.1
+    ports:
+      - 9201:9201
     command: ['-influxdb-url=http://influxdb:8086']
 
