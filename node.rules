@@ -1,0 +1,16 @@
+ALERT TestAlert
+    IF sum by (mode, instance) (node_cpu{mode="user", job="node"}) > 0.1
+    FOR 5s
+    LABELS {
+        severity = "critical"
+    }
+
+ALERT NodeDiskIOUtilizationWarning
+    IF topk(1, irate(node_disk_io_time_ms{job='node'}[5m]) / 1000 * 100) > 15
+    LABELS {
+      severity = "warning"
+    }
+    ANNOTATIONS {
+      summary = "Disk utilization greater than 75% for the last 5m.",
+      description = "Disk utilization us exceptionally high."
+    }
