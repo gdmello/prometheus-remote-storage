@@ -6,6 +6,7 @@ services:
       - 8086:8086
     volumes:
       - $PWD:/var/lib/influxdb
+    network_mode: 'host'
 
   nodeexporter:
     image: quay.io/prometheus/node-exporter
@@ -16,19 +17,26 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-#    network_mode: 'host'
+    network_mode: 'host'
+
+  remotestorageadapter:
+    image: gavind/prometheus-remote-storage-adapter:1.0
+    ports:
+      - 9201:9201
+    command: ['-influxdb-url=http://localhost:8086', '-influxdb.database=prometheus', '-influxdb.retention-policy=autogen']
+    network_mode: 'host'
+    depends_on:
+      - influxdb
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v1.7.1
     ports:
       - 9090:9090
     volumes:
       - $PWD:/tmp/prometheus
     command: ['--config.file=/tmp/prometheus/prometheus.yml']
-
-  remotestorageadapter:
-    image: gavind/prometheus-remote-storage-adapter:0.1
-    ports:
-      - 9201:9201
-    command: ['-influxdb-url=http://influxdb:8086']
-
+    depends_on:
+      - remotestorageadapter
+      - influxdb
+      - nodeexporter
+    network_mode: 'host'
