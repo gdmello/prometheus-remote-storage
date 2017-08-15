@@ -1,4 +1,4 @@
-FROM busybox:1.27.1-glibc
+FROM ubuntu:14.04
 
 COPY remote_storage_adapter /
 
